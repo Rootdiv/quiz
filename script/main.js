@@ -4,10 +4,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnOpenModal = document.getElementById('btnOpenModal');
   const modalBlock = document.getElementById('modalBlock');
   const closeModal = document.getElementById('closeModal');
+  const modal = document.querySelector('.modal');
   const questionTitle = document.getElementById('question');
   const formAnswers = document.getElementById('formAnswers');
   const nextButton = document.getElementById('next');
   const prevButton = document.getElementById('prev');
+  const burgerBtn = document.getElementById('burger');
 
   /* eslint-disable indent */
   const questions = [{
@@ -124,11 +126,37 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   };
 
+  const burgerMenu = () => {
+    if (document.documentElement.clientWidth < 768) {
+      burgerBtn.style.display = 'flex';
+    } else {
+      burgerBtn.style.display = 'none';
+    }
+  };
+  burgerMenu();
+
+  window.addEventListener('resize', () => {
+    burgerMenu();
+  });
+
+  burgerBtn.addEventListener('click', () => {
+    burgerBtn.classList.add('active');
+    modalBlock.classList.add('d-block');
+    palyTest();
+  });
+
   btnOpenModal.addEventListener('click', () => {
     modalBlock.classList.add('d-block');
     palyTest();
   });
   closeModal.addEventListener('click', () => {
     modalBlock.classList.remove('d-block');
+    burgerBtn.classList.remove('active');
+  });
+  modal.addEventListener('click', event => {
+    if (!event.target.closest('.modal-dialog')) {
+      modalBlock.classList.remove('d-block');
+      burgerBtn.classList.remove('active');
+    }
   });
 });
