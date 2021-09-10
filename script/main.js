@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const formAnswers = document.getElementById('formAnswers');
   const nextButton = document.getElementById('next');
   const prevButton = document.getElementById('prev');
+  const sendButton = document.getElementById('send');
   const burgerBtn = document.getElementById('burger');
 
   /* eslint-disable indent */
@@ -84,45 +85,91 @@ document.addEventListener('DOMContentLoaded', () => {
   /* eslint-enable indent */
 
   const palyTest = () => {
+    const finalAnswers = [];
     let numberQuestion = 0;
     const renderAnswers = index => {
       questions[index].answers.forEach(answer => {
         const answerItem = document.createElement('div');
-        answerItem.className = 'answers-item d-flex flex-column';
+        answerItem.className = 'answers-item d-flex justify-content-center';
         answerItem.innerHTML = `
-          <div class="answers-item d-flex flex-column">
-            <input type="${questions[index].type}" id="${answer.title}" name="answer" class="d-none">
-            <label for="${answer.title}" class="d-flex flex-column justify-content-between">
-              <img class="answerImg" src="${answer.url}" alt="burger">
-              <span>${answer.title}</span>
-            </label>
-          </div>
+          <input type="${questions[index].type}" id="${answer.title}" name="answer" class="d-none"
+            value="${answer.title}" />
+          <label for="${answer.title}" class="d-flex flex-column justify-content-between">
+            <img class="answerImg" src="${answer.url}" alt="burger">
+            <span>${answer.title}</span>
+          </label>
         `;
         formAnswers.append(answerItem);
       });
     };
     const renderQuestion = indexQuestion => {
       formAnswers.textContent = '';
-      if (numberQuestion >= 0 && numberQuestion <= questions.length - 1) {
-        questionTitle.textContent = questions[indexQuestion].question;
-        prevButton.classList.remove('d-none');
-        nextButton.classList.remove('d-none');
-        renderAnswers(indexQuestion);
+      /* eslint-disable indent */
+      switch (true) {
+        case (numberQuestion >= 0 && numberQuestion <= questions.length - 1):
+          questionTitle.textContent = questions[indexQuestion].question;
+          if (numberQuestion === 0) {
+            prevButton.classList.add('d-none');
+          } else {
+            prevButton.classList.remove('d-none');
+          }
+          nextButton.classList.remove('d-none');
+          sendButton.classList.add('d-none');
+          renderAnswers(indexQuestion);
+          break;
+        case (numberQuestion === questions.length):
+          questionTitle.textContent = '';
+          prevButton.classList.add('d-none');
+          nextButton.classList.add('d-none');
+          sendButton.classList.remove('d-none');
+          formAnswers.innerHTML = `
+            <div class="form-group">
+              <label for="numberPhone">Введите Ваш телефон</label>
+              <input type="tel" id="numberPhone" name="phone" class="form-control" />
+            </div>
+          `;
+          break;
+        case (numberQuestion === questions.length + 1):
+          questionTitle.textContent = '';
+          formAnswers.textContent = 'Спасибо за пройденный тест!';
+          sendButton.classList.add('d-none');
+          setTimeout(() => {
+            modalBlock.classList.remove('d-block');
+            burgerBtn.classList.remove('active');
+          }, 2000);
+          break;
+        default:
+          console.log('Что-то пошло не так');
       }
-      if (numberQuestion === 0) {
-        prevButton.classList.add('d-none');
-      } else if (numberQuestion === questions.length - 1) {
-        nextButton.classList.add('d-none');
-      }
+      /* eslint-enable indent */
+    };
+    const checkAnswer = () => {
+      const obj = {};
+      const inputs = [...formAnswers.elements].filter(input => input.checked || input.id === 'numberPhone');
+      inputs.forEach((input, index) => {
+        if (numberQuestion >= 0 && numberQuestion <= questions.length - 1) {
+          obj[`${index}_${questions[numberQuestion].question}`] = input.value;
+        } else if (numberQuestion === questions.length) {
+          obj['Номер телефона'] = input.value;
+        }
+      });
+      finalAnswers.push(obj);
     };
     renderQuestion(numberQuestion);
     nextButton.onclick = () => {
+      checkAnswer();
       numberQuestion++;
       renderQuestion(numberQuestion);
     };
     prevButton.onclick = () => {
       numberQuestion--;
       renderQuestion(numberQuestion);
+    };
+    sendButton.onclick = () => {
+      checkAnswer();
+      numberQuestion++;
+      renderQuestion(numberQuestion);
+      console.log(finalAnswers);
     };
   };
 
