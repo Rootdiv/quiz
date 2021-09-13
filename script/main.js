@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalBlock = document.getElementById('modalBlock');
   const closeModal = document.getElementById('closeModal');
   const modal = document.querySelector('.modal');
+  const modalDialog = document.querySelector('.modal-dialog');
   const questionTitle = document.getElementById('question');
   const formAnswers = document.getElementById('formAnswers');
   const nextButton = document.getElementById('next');
@@ -83,6 +84,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   ];
   /* eslint-enable indent */
+
+  let count = -100,
+    interval;
+  modalDialog.style.top = count + '%';
+  const animateModal = () => {
+    count++;
+    interval = requestAnimationFrame(animateModal);
+    if (count < 0) {
+      modalDialog.style.top = count + '%';
+    } else {
+      cancelAnimationFrame(interval);
+      count = -100;
+    }
+  };
 
   const palyTest = () => {
     const finalAnswers = [];
@@ -193,6 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   btnOpenModal.addEventListener('click', () => {
+    requestAnimationFrame(animateModal);
     modalBlock.classList.add('d-block');
     palyTest();
   });
