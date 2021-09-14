@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const prevButton = document.getElementById('prev');
   const sendButton = document.getElementById('send');
   const burgerBtn = document.getElementById('burger');
+  const modalTitle = document.querySelector('.modal-title');
 
   /* eslint-disable indent */
   const questions = [{
@@ -89,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
     interval;
   modalDialog.style.top = count + '%';
   const animateModal = () => {
-    count++;
+    count += 2;
     interval = requestAnimationFrame(animateModal);
     if (count < 0) {
       modalDialog.style.top = count + '%';
@@ -101,6 +102,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const palyTest = () => {
     const finalAnswers = [];
+    const obj = {};
+    modalTitle.textContent = 'Ответь на вопрос:';
     let numberQuestion = 0;
     const renderAnswers = index => {
       questions[index].answers.forEach(answer => {
@@ -134,6 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
           break;
         case (numberQuestion === questions.length):
           questionTitle.textContent = '';
+          modalTitle.textContent = '';
           prevButton.classList.add('d-none');
           nextButton.classList.add('d-none');
           sendButton.classList.remove('d-none');
@@ -143,11 +147,20 @@ document.addEventListener('DOMContentLoaded', () => {
               <input type="tel" id="numberPhone" name="phone" class="form-control" />
             </div>
           `;
+          // eslint-disable-next-line no-case-declarations
+          const numberPhone = document.getElementById('numberPhone');
+          numberPhone.addEventListener('input', event => {
+            event.target.value = event.target.value.replace(/[^0-9+-]/, '');
+          });
           break;
         case (numberQuestion === questions.length + 1):
-          questionTitle.textContent = '';
           formAnswers.textContent = 'Спасибо за пройденный тест!';
           sendButton.classList.add('d-none');
+          for (const key in obj) {
+            const newObj = {};
+            newObj[key] = obj[key];
+            finalAnswers.push(newObj);
+          }
           setTimeout(() => {
             modalBlock.classList.remove('d-block');
             burgerBtn.classList.remove('active');
@@ -159,7 +172,6 @@ document.addEventListener('DOMContentLoaded', () => {
       /* eslint-enable indent */
     };
     const checkAnswer = () => {
-      const obj = {};
       const inputs = [...formAnswers.elements].filter(input => input.checked || input.id === 'numberPhone');
       inputs.forEach((input, index) => {
         if (numberQuestion >= 0 && numberQuestion <= questions.length - 1) {
@@ -168,7 +180,6 @@ document.addEventListener('DOMContentLoaded', () => {
           obj['Номер телефона'] = input.value;
         }
       });
-      finalAnswers.push(obj);
     };
     renderQuestion(numberQuestion);
     nextButton.onclick = () => {
@@ -184,7 +195,6 @@ document.addEventListener('DOMContentLoaded', () => {
       checkAnswer();
       numberQuestion++;
       renderQuestion(numberQuestion);
-      console.log(finalAnswers);
     };
   };
 
