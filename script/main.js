@@ -14,78 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const burgerBtn = document.getElementById('burger');
   const modalTitle = document.querySelector('.modal-title');
 
-  /* eslint-disable indent */
-  const questions = [{
-      question: 'Какого цвета бургер?',
-      answers: [{
-          title: 'Стандарт',
-          url: './image/burger.png'
-        },
-        {
-          title: 'Черный',
-          url: './image/burgerBlack.png'
-        }
-      ],
-      type: 'radio'
-    },
-    {
-      question: 'Из какого мяса котлета?',
-      answers: [{
-          title: 'Курица',
-          url: './image/chickenMeat.png'
-        },
-        {
-          title: 'Говядина',
-          url: './image/beefMeat.png'
-        },
-        {
-          title: 'Свинина',
-          url: './image/porkMeat.png'
-        }
-      ],
-      type: 'radio'
-    },
-    {
-      question: 'Дополнительные ингредиенты?',
-      answers: [{
-          title: 'Помидор',
-          url: './image/tomato.png'
-        },
-        {
-          title: 'Огурец',
-          url: './image/cucumber.png'
-        },
-        {
-          title: 'Салат',
-          url: './image/salad.png'
-        },
-        {
-          title: 'Лук',
-          url: './image/onion.png'
-        }
-      ],
-      type: 'checkbox'
-    },
-    {
-      question: 'Добавить соус?',
-      answers: [{
-          title: 'Чесночный',
-          url: './image/sauce1.png'
-        },
-        {
-          title: 'Томатный',
-          url: './image/sauce2.png'
-        },
-        {
-          title: 'Горчичный',
-          url: './image/sauce3.png'
-        }
-      ],
-      type: 'radio'
-    }
-  ];
-  /* eslint-enable indent */
-
   let count = -100,
     interval;
   modalDialog.style.top = count + '%';
@@ -100,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  const palyTest = () => {
+  const palyTest = questions => {
     const finalAnswers = [];
     const obj = {};
     modalTitle.textContent = 'Ответь на вопрос:';
@@ -136,8 +64,8 @@ document.addEventListener('DOMContentLoaded', () => {
           renderAnswers(indexQuestion);
           break;
         case (numberQuestion === questions.length):
-          questionTitle.textContent = '';
           modalTitle.textContent = '';
+          questionTitle.textContent = '';
           prevButton.classList.add('d-none');
           nextButton.classList.add('d-none');
           sendButton.classList.remove('d-none');
@@ -211,16 +139,33 @@ document.addEventListener('DOMContentLoaded', () => {
     burgerMenu();
   });
 
+  const getData = () => {
+    modalTitle.textContent = '';
+    questionTitle.textContent = '';
+    formAnswers.innerHTML = '<img src="./image/loader.svg" alt="Загрузка данных..." />';
+    prevButton.classList.add('d-none');
+    nextButton.classList.add('d-none');
+    setTimeout(() => {
+      fetch('./questions.json')
+        .then(res => res.json())
+        .then(obj => palyTest(obj.questions))
+        .catch(err => {
+          formAnswers.textContent = 'Ошибка загрузки данных!';
+          console.error(err);
+        });
+    }, 2000);
+  };
+
   burgerBtn.addEventListener('click', () => {
     burgerBtn.classList.add('active');
     modalBlock.classList.add('d-block');
-    palyTest();
+    getData();
   });
 
   btnOpenModal.addEventListener('click', () => {
     requestAnimationFrame(animateModal);
     modalBlock.classList.add('d-block');
-    palyTest();
+    getData();
   });
   closeModal.addEventListener('click', () => {
     modalBlock.classList.remove('d-block');
